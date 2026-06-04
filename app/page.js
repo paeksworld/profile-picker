@@ -2,6 +2,23 @@
 
 import { useState, useRef } from 'react'
 
+function compressImage(dataUrl, maxSize) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      let w = img.width, h = img.height
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = (h * maxSize) / w; w = maxSize }
+        else { w = (w * maxSize) / h; h = maxSize }
+      }
+      canvas.width = w; canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/jpeg', 0.7))
+    }
+    img.src = dataUrl
+  })
+}
 export default function Home() {
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(false)
@@ -43,10 +60,13 @@ export default function Home() {
     setResults(null)
 
     try {
-      const images = photos.map((p) => ({
-        mediaType: p.file.type || 'image/jpeg',
-        data: p.dataUrl.split(',')[1],
-      }))
+      const images = await Promise.all(photos.map(async (p) => {
+  const compressed = await compressImage(p.dataUrl, 800)
+  return {
+    mediaType: 'image/jpeg',
+    data: compressed.split(',')[1],
+  }
+}))
 
       const res = await fetch('/api/analyze', {
         method: 'POST',
