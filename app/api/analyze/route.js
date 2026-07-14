@@ -45,7 +45,7 @@ score는 아래 기준으로 채점해 (합산 10점):
 - 배경/구도/조명: 0-2점
 - 옷차림/스타일: 0-2점
 
-각 사진을 위 기준으로 독립적으로 채점해. 매번 동일한 기준으로 일관되게 평가할 것.
+각 사진을 위 기준으로 독립적으로 채점해. 매번 동일한 기준으로 일관되게 평가할 것.`
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
