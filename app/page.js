@@ -2,11 +2,17 @@
 
 import { useState, useRef } from 'react'
 
-// Capacitor 앱은 정적 파일로 빌드되기 때문에 API는 배포된 Vercel 서버를 호출해야 함
-const API_BASE =
-  typeof window !== 'undefined' && window.location.protocol.startsWith('http')
-    ? '' // 웹(브라우저/Vercel)에서는 기존처럼 상대경로 사용
-    : 'https://profile-picker.vercel.app' // 앱(capacitor://, file://)에서는 절대경로 사용
+// Capacitor 앱은 내부적으로 https://localhost 로 페이지를 로드하기 때문에
+// protocol만으로는 웹/앱을 구분할 수 없음. Capacitor가 네이티브 앱에서
+// 자동으로 주입하는 window.Capacitor 객체로 정확히 판단함.
+function getApiBase() {
+  if (typeof window === 'undefined') return ''
+  const isNativeApp =
+    window.Capacitor &&
+    typeof window.Capacitor.isNativePlatform === 'function' &&
+    window.Capacitor.isNativePlatform()
+  return isNativeApp ? 'https://profile-picker.vercel.app' : ''
+}
 
 function compressImage(dataUrl, maxSize) {
   return new Promise((resolve) => {
@@ -84,7 +90,7 @@ export default function Home() {
         }
       }))
 
-      const res = await fetch(`${API_BASE}/api/analyze`, {
+      const res = await fetch(`${getApiBase()}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ images, count: photos.length, mode }),
