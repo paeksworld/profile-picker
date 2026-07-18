@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">소개팅 사진 고르기</string>
+    <string name="title_activity_main">소개팅 사진 고르기</string>
+    <string name="package_name">com.paeksworld.profilepicker</string>
+    <string name="custom_url_scheme">com.paeksworld.profilepicker</string>
+</resources>

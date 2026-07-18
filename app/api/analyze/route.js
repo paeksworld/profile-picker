@@ -1,9 +1,19 @@
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders })
+}
+
 export async function POST(req) {
   try {
     const { images, count } = await req.json()
 
     if (!images || images.length < 2) {
-      return Response.json({ error: '사진을 2장 이상 올려줘' }, { status: 400 })
+      return Response.json({ error: '사진을 2장 이상 올려줘' }, { status: 400, headers: corsHeaders })
     }
 
     const imageBlocks = images.map((img) => ({
@@ -74,8 +84,8 @@ score는 아래 기준으로 채점해 (합산 10점):
     const clean = text.replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(clean)
 
-    return Response.json(parsed)
+    return Response.json(parsed, { headers: corsHeaders })
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 })
+    return Response.json({ error: err.message }, { status: 500, headers: corsHeaders })
   }
 }

@@ -2,6 +2,12 @@
 
 import { useState, useRef } from 'react'
 
+// Capacitor 앱은 정적 파일로 빌드되기 때문에 API는 배포된 Vercel 서버를 호출해야 함
+const API_BASE =
+  typeof window !== 'undefined' && window.location.protocol.startsWith('http')
+    ? '' // 웹(브라우저/Vercel)에서는 기존처럼 상대경로 사용
+    : 'https://profile-picker.vercel.app' // 앱(capacitor://, file://)에서는 절대경로 사용
+
 function compressImage(dataUrl, maxSize) {
   return new Promise((resolve) => {
     const img = new Image()
@@ -78,7 +84,7 @@ export default function Home() {
         }
       }))
 
-      const res = await fetch('/api/analyze', {
+      const res = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ images, count: photos.length, mode }),
