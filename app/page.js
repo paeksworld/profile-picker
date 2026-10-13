@@ -100,13 +100,16 @@ export default function Home() {
       if (data.error) throw new Error(data.error)
 
       const order = shuffled.map(p => p.origIndex)
+      const remappedBestNum = order[data.bestNum - 1] + 1
       const remapped = {
         ...data,
         photos: data.photos.map(p => ({
           ...p,
-          num: order[p.num - 1] + 1
+          num: order[p.num - 1] + 1,
+          isBest: (order[p.num - 1] + 1) === remappedBestNum
         })),
-        bestNum: order[data.bestNum - 1] + 1
+        bestNum: remappedBestNum,
+        summary: `베스트는 사진 ${remappedBestNum}. ${data.summary}`
       }
       setResults(remapped)
     } catch (err) {
