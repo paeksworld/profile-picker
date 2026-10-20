@@ -77,7 +77,18 @@ function femalePrompt(count) {
   "bestReason": "가장 만나보고 싶게 만드는 이유 한 문장"
 }
 
-사진 번호는 1부터 ${count}까지 모두 정확히 한 번씩 포함해.`
+사진 번호는 1부터 ${count}까지 모두 정확히 한 번씩 포함해.
+
+
+IMPORTANT OUTPUT RULES:
+- Return ONLY valid JSON.
+- Do not use markdown code fences.
+- Do not include any text before or after the JSON.
+- All string values must be properly escaped.
+- Do not insert literal line breaks inside JSON string values.
+- Complete the entire JSON object before stopping.
+- Keep comments concise so the response fits within the token limit.
+`
 }
 
 function malePrompt(count) {
@@ -101,7 +112,7 @@ function malePrompt(count) {
   "bestNum": 2,
   "bestReason": "베스트 이유 한 문장"
 }
-사진 번호는 1부터 ${count}까지 모두 정확히 한 번씩 포함해.`
+사진 번호는 1부터 ${count}까지 모두 정확히 한 번씩 포함해.
 
 IMPORTANT OUTPUT RULES:
 - Return ONLY valid JSON.
@@ -111,7 +122,7 @@ IMPORTANT OUTPUT RULES:
 - Do not insert literal line breaks inside JSON string values.
 - Complete the entire JSON object before stopping.
 - Keep comments concise so the response fits within the token limit.
-
+`
 }
 
 function normalizeResult(parsed, count) {
