@@ -164,7 +164,6 @@ export async function POST(req) {
       body: JSON.stringify({
         model: 'claude-haiku-5-5',
         max_tokens: 1800,
-        temperature: 0,
         messages: [
           {
             role: 'user',
