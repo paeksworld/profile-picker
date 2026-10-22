@@ -125,7 +125,7 @@ IMPORTANT OUTPUT RULES:
 `
 }
 
-function normalizeResult(parsed, count) {
+function normalizeResult(parsed, count, language = 'ko') {
   if (!parsed || !Array.isArray(parsed.photos)) throw new Error('분석 결과 형식이 올바르지 않아')
 
   const photos = parsed.photos
@@ -152,13 +152,19 @@ function normalizeResult(parsed, count) {
     summary: String(parsed.summary || '').trim(),
     photos,
     bestNum: best.num,
-    bestReason: String(best.comment || parsed.bestReason || '실제 소개팅 프로필에서 가장 호감이 잘 전달되는 사진이야.').trim(),
+    bestReason: String(
+      best.comment ||
+      parsed.bestReason ||
+      (language === 'en'
+        ? 'This photo gives the strongest overall impression for a dating profile.'
+        : '실제 소개팅 프로필에서 가장 호감이 잘 전달되는 사진이야.')
+    ).trim(),
   }
 }
 
 export async function POST(req) {
   try {
-    const { images, count, mode = 'female' } = await req.json()
+    const { images, count, mode = 'female', language = 'ko' } = await req.json()
 
     if (!images || images.length < 2) {
       return Response.json({ error: '사진을 2장 이상 올려줘' }, { status: 400, headers: corsHeaders })
@@ -173,8 +179,27 @@ export async function POST(req) {
       },
     }))
 
-    const prompt = mode === 'male' ? malePrompt(count) : femalePrompt(count)
+    const basePrompt = mode === 'male' ? malePrompt(count) : femalePrompt(count)
 
+    const languageInstruction =
+      language === 'en'
+        ? `
+
+IMPORTANT LANGUAGE RULE:
+- Write ALL natural-language output in English.
+- "summary", "comment", every item in "good", every item in "bad", and "bestReason" must be in natural English.
+- Do not output Korean anywhere in the JSON values.
+`
+    : `
+IMPORTANT LANGUAGE RULE:
+- Write ALL natural-language output in Korean.
+`
+
+const prompt = `${basePrompt}
+
+${languageInstruction}`
+
+    
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -200,7 +225,7 @@ export async function POST(req) {
     const text = data.content.map((b) => b.text || '').join('')
     const clean = text.replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(clean)
-    const normalized = normalizeResult(parsed, count)
+    const normalized = normalizeResult(parsed, count, language)
 
     return Response.json(normalized, { headers: corsHeaders })
   } catch (err) {
